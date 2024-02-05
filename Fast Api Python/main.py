@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Path
 
 app = FastAPI()
 
@@ -22,6 +22,6 @@ dataBase = {
 
 
 @app.get("/get-user/{user_id}")
-def get_user(user_id: int):
+def get_user(user_id: int = Path(None, description="The ID of the user you'd like to view")):
 
     return dataBase[user_id]
