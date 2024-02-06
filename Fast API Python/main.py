@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path, Query, HTTPException
 from typing import Optional
 from pydantic import BaseModel
 
@@ -32,13 +32,13 @@ def get_user(*, user_id: int, name: Optional[str] = None, test: int):
     for user_id in database:
         if database[user_id].name == name:
             return database[user_id]
-    return {"Error": "User not found"}
+    raise HTTPException(status_code=404, detail="User not found")
 
 
 @app.post("/create-user/{user_id}")
 def create_user(user_id: int, user: User):
     if user_id in database:
-        return {"Error": "User exists"}
+        raise HTTPException(status_code=400, detail="User already exists")
 
     database[user_id] = {"name": user.name, "age": user.age,
                          "city": user.city, "state": user.state}
@@ -48,7 +48,7 @@ def create_user(user_id: int, user: User):
 @app.put("/update-user/{user_id}")
 def update_user(user_id: int, user: User):
     if user_id not in database:
-        return {"Error": "User does not exist"}
+        raise HTTPException(status_code=404, detail="User does not exist")
 
     if user.name != None:
         database[user_id]["name"] = user.name
@@ -65,7 +65,7 @@ def update_user(user_id: int, user: User):
 @app.delete("/delete-user")
 def delete_user(user_id: int = Query(..., description="The ID of the user you'd like to delete", gt=0, lt=2)):
     if user_id not in database:
-        return {"Error": "User does not exist"}
+        raise HTTPException(status_code=404, detail="User does not exist")
 
     del database[user_id]
     return {"Message": "User deleted successfully"}
