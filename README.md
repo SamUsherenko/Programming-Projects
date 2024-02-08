@@ -1,1 +1,1 @@
-Personal and In-Class Projects.
+**Personal and In-Class Projects.**
